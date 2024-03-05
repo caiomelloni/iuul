@@ -75,7 +75,7 @@ async function main() {
 	compararVertices(vertices);
 
 	console.log("\nAgora vamos mudar os vertices de posicao e comparar novamente");
-	let novasPosicoes = await ler3Vertices();
+	let novasPosicoes = await lerVertices(3);
 
 	for (let i = 0; i < vertices.length; i++) {
 		let newX = novasPosicoes[i].x
@@ -89,3 +89,9 @@ async function main() {
 }
 
 main()
+
+
+module.exports = {
+	Vertice,
+	lerVertices
+}
