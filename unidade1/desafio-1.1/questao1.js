@@ -32,7 +32,7 @@ class Vertice {
 }
 
 
-async function ler3Vertices() {
+async function lerVertices(quantosVertices) {
 	let vertices = [];
 
 	const readline = require('readline').createInterface({
@@ -41,7 +41,7 @@ async function ler3Vertices() {
 	});
 	const it = readline[Symbol.asyncIterator]();
 
-	for(let i = 1; i<4; i++) {
+	for(let i = 1; i<quantosVertices+1; i++) {
 		console.log("x" + i + ": ");
 		const x = Number((await it.next()).value);
 
@@ -69,7 +69,7 @@ function compararVertices(vertices) {
 
 async function main() {
 
-	let vertices = await ler3Vertices();
+	let vertices = await lerVertices(3);
 	console.log("\n");
 
 	compararVertices(vertices);
