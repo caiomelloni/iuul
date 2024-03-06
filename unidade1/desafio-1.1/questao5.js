@@ -12,11 +12,21 @@ async function lerLinha() {
 }
 
 async function lerCliente() {
+	clienteArray = []
+	
 	console.log("Digite o nome, cpf, data de nascimento, renda mensal, estado civil e o numero de dependentes do cliente. Separados por espaco")
 
-	let cliente = await lerLinha()
+	while (true) {
 
-	return cliente.replace(/\s+/g, ' ').split(" ")
+		let cliente = await lerLinha()
+		clienteArray =  cliente.replace(/\s+/g, ' ').split(" ")
+
+		if (clienteArray.length !== 6) {
+			console.log("Digite os 6 campos obrigatorios!")
+		} else { break }
+	}
+
+	return clienteArray
 
 }
 
@@ -32,12 +42,12 @@ class Cliente {
 	}
 
 	constructor(nome, cpf, nascimento, renda, estadoCivil, dependentes) {
-		this.nome = nome
-		this.cpf = cpf
-		this.nascimento = nascimento
-		this.renda = renda
-		this.estadoCivil = estadoCivil
-		this.dependentes = dependentes
+		this.nome = Cliente.#validarNome(nome)
+		this.cpf = Cliente.#validarCpf(cpf)
+		this.nascimento = Cliente.#validarNascimento(nascimento)
+		this.renda = Cliente.#validarRenda(renda)
+		this.estadoCivil = Cliente.#validarEstadoCivil(estadoCivil)
+		this.dependentes = Cliente.#validarDependentes(dependentes)
 	}
 
 	static #validarNome(nome) {
@@ -48,45 +58,97 @@ class Cliente {
 
 	static #validarCpf(cpf) {
 		let cpfNumber = Number(cpf)
-		if (cpfNumber == NaN || String(cpfNumber).length != 11) throw Cliente.erros.cpf
-		return cpfNumber
+		if (cpfNumber == NaN || cpf.length != 11) throw Cliente.erros.cpf
+		let cpfString = cpf
+		return cpfString.substring(0,3) + "." + cpfString.substring(3,6) + "." +cpfString.substring(6,9) + "-" + cpfString.substring(9) 
 	}
 
 	static #validarNascimento(nascimento) {
 		let [diaString, mesString, anoString] = nascimento.split("/")
 		let date = new Date(mesString + "/" + diaString + "/" + anoString)
-		if (isNaN(date)) throw Cliente.erros.dtNascimento
-		return date
+		let idade = (new Date().getFullYear()) - Number(anoString) 
+		if (isNaN(date) || idade < 18) throw Cliente.erros.dtNascimento
+		return mesString + "/" + diaString + "/" + anoString 
 	}
 
 	static #validarRenda(renda) {
 		let rendaString = renda.replace(",", ".")
-		let renda = Number(Number(rendaString).toFixed(2))
-		if (renda == NaN) throw Cliente.erros.renda
+		let rendaNumber = Number(rendaString)
+		if (rendaNumber == NaN || rendaNumber < 0) throw Cliente.erros.renda
+		return rendaNumber.toFixed(2)
 	}
 
 	static #validarEstadoCivil(estadoCivil) {
+		let estadoCivilString = String(estadoCivil).toUpperCase()
+		if (!["C", "S", "V", "D"].includes(estadoCivilString)) throw Cliente.erros.estadoCivil
 
+		return estadoCivilString
+
+	}
+
+	static #validarDependentes(dependentes) {
+		let dependentesNumber = Number(dependentes)
+
+		if (isNaN(dependentesNumber) || dependentesNumber > 10 || dependentesNumber < 0) {
+			throw Cliente.erros.dependentes
+		}
+		return dependentesNumber
 	}
 
 }
 
 async function main() {
 	console.log("qual o numero de clientes?")
-	const qtdClientes = Number(await lerLinha())
-	console.log(qtdClientes)
+	let qtdClientes = Number(await lerLinha())
 	while (!Number.isInteger(qtdClientes) || qtdClientes < 0) {
 		console.log("digite um numbero inteiro de clientes!")
-		const qtdClientes = Number(await lerLinha())
+		qtdClientes = Number(await lerLinha())
+		console.log("\n\n")
 	}
+	console.log("\n\n")
 
 	let clientes = []
 	for (let i = 0; i < qtdClientes; i++) {
-		let cliente = await lerCliente()
-		clientes.push(cliente)
+		while (true) {
+			try {
+				let cliente = new Cliente(...(await lerCliente()))
+				clientes.push(cliente)
+				break
+			} catch(e) {
+				switch(e) {
+					case Cliente.erros.nome:
+						console.log("Nome invalido!")
+						break
+					case Cliente.erros.cpf:
+						console.log("Cpf invalido!")
+						break
+					case Cliente.erros.dtNascimento:
+						console.log("Data de nascimento invalida!")
+						break
+					case Cliente.erros.renda:
+						console.log("Renda invalida!")
+						break
+					case Cliente.erros.estadoCivil:
+						console.log("Estado civil invalido!")
+						break
+					case Cliente.erros.dependentes:
+						console.log("Numero de dependentes invalido!")
+						break
+					default:
+						console.log(e)
+						console.log("Erro desconhecido!")
+
+				}
+				console.log("\n\n")
+			}
+		}
 	}
 
-	console.log(clientes)
+	console.log("\n\nCLIENTES:")
+	console.log("nome | cpf | nascimento | renda | estado civil | dependentes\n")
+	for (cliente of clientes) {
+		console.log(cliente.nome + " | ", cliente.cpf + " | ", cliente.nascimento + " | ", cliente.renda + " | ", cliente.estadoCivil + " | ", cliente.dependentes)
+	}
 
 }
 
