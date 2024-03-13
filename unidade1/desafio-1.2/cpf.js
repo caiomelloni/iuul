@@ -27,6 +27,10 @@ class Cpf extends Response {
 
 	}
 
+	copy() {
+		return new Cpf(this.cpf)
+	}
+
 	equals(cpfObj) {
 		return this.cpf === cpfObj.cpf
 	}

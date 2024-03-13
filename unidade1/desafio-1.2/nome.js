@@ -7,11 +7,15 @@ class Nome extends Response {
 			super(true, "nome invalido, deve conter pelo menos 5 caracteres")
 		} else {
 			super(false, "")
-			this.#nome = nome
+			this.#nome = String(nome)
 		}
 	}
 
 	get nome() { return this.#nome }
+
+	copy() { return new Nome(this.#nome) }
+
+
 }
 
 
