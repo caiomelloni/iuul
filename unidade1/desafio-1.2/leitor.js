@@ -1,5 +1,7 @@
 const { Cpf } = require("./cpf.js")
-const { Nome } = require(
+const { Nome } = require("./nome.js")
+const { DtNascimento } = require("./dtnascimento")
+const { Paciente } = require("./paciente")
 class Leitor {
 	constructor() {}
 	async lerLinha() {
@@ -14,25 +16,45 @@ class Leitor {
 		return linha;
 	}
 
+	// le um numero de opcao para o menu
+	async lerInputMenu() {
+		let input = await this.lerLinha()
+		input = Number(input)
+		return input
+	}
+
 	// le na sequencia: cpf, nome e data de nascimento
 	// se houver erro em uma leitura, retornamos sua response
 	// se todas leituras forem bem sucedidas, retornamos o cliente
 	async lerPaciente() {
-		console.log("cpf:")
-		let cpfString = await lerLinha()
+		process.stdout.write("CPF: ");
+		let cpfString = await this.lerLinha()
 		let cpf = new Cpf(cpfString)
 		if (cpf.hasError) return cpf
 
-		console.log("nome:")
-		let nomeString = await lerLinha()
+		process.stdout.write("Nome: ");
+		let nomeString = await this.lerLinha()
 		let nome = new Nome(nomeString)
 		if (nome.hasError) return nome
 
-		console.log("data de nascimento:")
+		process.stdout.write("Data de nascimento: ");
+		let nascimentoString = await this.lerLinha()
+		let dtNascimento = new DtNascimento(nascimentoString)
+		if (dtNascimento.hasError) return dtNascimento
 
+		return new Paciente(cpf, nome, dtNascimento)
 	}
+}
+
+async function main() {
+
+}
+
+if (require.main == module) {
+	main()
 }
 
 module.exports = {
 	Leitor	
 }
+
